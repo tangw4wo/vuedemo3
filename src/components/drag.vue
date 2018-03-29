@@ -2,7 +2,7 @@
   <div class="drag">
       <div class="drag-bg"  style="width:0" ref="bg" :class="{bgDrag:dragover}"></div>
       <div class="drag-text" 
-      :class="{textchangeS:checkstate && !dragstate,isloading:dragloading,textchangerr:errText}"
+      :class="{textchangeS:checkstatus && !dragstatus,isloading:dragloading,textchangerr:errText,drag_text_lg:!checkstatus}"
       @click="refresh">{{dragText}}</div>
       <div class="drag-handler" @mousedown="dragstart" ref="handler" style="left:0" :class="{handlerDrag:dragover}"></div>
   </div>
@@ -13,7 +13,7 @@ export default {
     data(){
         return{
             //判断是否开始拖动
-            mousemovestate:false,
+            mousemovestatus:false,
             //当前的x坐标
             beginClientX:0,
             //最大拖动距离
@@ -21,25 +21,25 @@ export default {
             //当前的拖动距离
             nowWidth:0,
             //判断拖动完成状态
-            checkstate:false,
+            checkstatus:false,
             //拖动文字提示
             dragText:'请按住滑块，拖动到最右边',
             //等待服务器回应状态
             dragloading:false,
             //服务器回应状态
-            dragstate:false,
+            dragstatus:false,
             istest:false
         }
     },
     computed:{
         errText(){
-            if(this.checkstate && this.dragstate){
+            if(this.checkstatus && this.dragstatus){
                 return true
             }
             return false 
         },
         dragover(){
-            if(!this.mousemovestate && this.nowWidth<this.maxwidth){
+            if(!this.mousemovestatus && this.nowWidth<this.maxwidth){
                 return true
             }else{
                 return false
@@ -48,37 +48,39 @@ export default {
     },
     methods:{
         refresh(){
-            if(!this.dragstate){
+            if(!this.dragstatus){
                 return
             }
             this.$emit('drag-refresh')
         },
         dragstart(event){
-             if(this.checkstate){
+             if(this.checkstatus){
                 return;
             }
-            this.mousemovestate=true;
+            this.mousemovestatus=true;
             this.beginClientX=event.clientX
         },
         succeed(){
-            this.checkstate=true;
-            this.mousemovestate=false;
+            this.checkstatus=true;
+            this.mousemovestatus=false;
             this.dragloading=true;
-            this.$axios.post('/user/reg/check').then((res)=>{
+            this.$axios.get('api/user/reg/check').then((res)=>{
                 if(res.data==='ok'){
                 this.dragText="验证通过"
                 this.dragloading=false;
                 this.$emit('users-live')
                 }else{
                 this.dragloading=false;
-                this.dragstate=true
+                this.dragstatus=true
                 this.dragText="发生错误，请点击刷新"    
                 }
             }).catch((err)=>{
                 this.dragloading=false;
-                this.dragstate=true
+                this.dragstatus=true
                 this.dragText="发生错误，请点击刷新"
-                console.log(err)
+                if (process.env.NODE_ENV !== 'production') {
+                        console.log(err)
+                }
             })
         },
     },
@@ -86,10 +88,10 @@ export default {
         let handler = this.$refs.handler
         let bg = this.$refs.bg
         document.addEventListener("mousemove",(event)=>{
-            if(this.checkstate){
+            if(this.checkstatus){
                 return;
             }
-           if(this.mousemovestate){
+           if(this.mousemovestatus){
                let width=event.clientX-this.beginClientX
                this.nowWidth=width;
                if(width>0 && width<this.maxwidth){
@@ -107,10 +109,10 @@ export default {
            }
         })
         document.addEventListener("mouseup",()=>{
-             if(this.checkstate){
+             if(this.checkstatus){
                 return;
             }
-            this.mousemovestate=false;
+            this.mousemovestatus=false;
             setTimeout(()=>{
                 if(this.nowWidth<this.maxwidth){
                 handler.style.left=0+'px'
@@ -178,8 +180,21 @@ export default {
                 height: 30px;
                 line-height: 30px;
                 min-width:30px;
-                transition:color 1s ease
+                transition:color 2s ease;
+                color:white
             }
+            .drag_text_lg{
+                -webkit-text-fill-color: transparent;
+                background-image:  -webkit-gradient(linear,left top,right top,color-stop(0,#4d4d4d),color-stop(.4,#4d4d4d),color-stop(.5,#fff),color-stop(.6,#4d4d4d),color-stop(1,#4d4d4d));
+                background-size: 200%,100%;
+                -webkit-background-clip: text;
+                -webkit-animation: word 2s linear infinite ;
+            }
+             @keyframes word {
+             0%{background-position: 0 0}
+             100%{background-position: -200% 0}
+         }
+
             .drag-bg{
                 position: absolute;
                 height: 30px;

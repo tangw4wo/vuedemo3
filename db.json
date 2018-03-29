@@ -90,7 +90,5 @@
         
       ]
     },
-    "orderList":{
-      
-    }
+    "phoneList":[{"country":"中国","phone":"+86"},{"country":"中国香港","phone":"+852"},{"country":"中国澳门","phone":"+853"},{"country":"中国台湾","phone":"+886"},{"country":"美国","phone":"+1"},{"country":"日本","phone":"+81"},{"country":"韩国","phone":"+82"},{"country":"马来西亚","phone":"+60"},{"country":"新加坡","phone":"+65"},{"country":"越南","phone":"+84"},{"country":"澳大利亚","phone":"+61"},{"country":"加拿大","phone":"+1"},{"country":"英国","phone":"+44"},{"country":"法国","phone":"+33"},{"country":"俄罗斯","phone":"+7"},{"country":"德国","phone":"+49"},{"country":"泰国","phone":"+66"},{"country":"印度","phone":"+91"},{"country":"菲律宾","phone":"+63"},{"country":"巴西","phone":"+55"},{"country":"印度尼西亚","phone":"+62"},{"country":"意大利","phone":"+39"},{"country":"土耳其","phone":"+90"}]
   }

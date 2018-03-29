@@ -1,6 +1,7 @@
 <template>
   <el-row class="information">
-    <el-col class="tabs-left" :span="12">
+    <div class="err" v-if="getContentErr"><span>404 </span>无法获取到相应的内容</div>
+    <el-col class="tabs-left" :span="12" v-if="!getContentErr">
       <ul>
         <li v-for="(item,index) in content.leftList" :key="index" :class="{is_hot:item.hot}">
             <a href="" class="hot_title" v-if="item.hot">{{item.title}}</a>
@@ -10,7 +11,7 @@
       </ul>
       <a href="xxx" class="more">了解更多</a>    
       </el-col>
-    <el-col class="tabs-right" :span="12">
+    <el-col class="tabs-right" :span="12" v-if="!getContentErr">
       <ul>
         <li v-for="(item,index) in content.rightList" :key="index" :class="{is_hot:item.hot}">
             <a href="" class="hot_title" v-if="item.hot">{{item.title}}</a>
@@ -27,32 +28,28 @@
 export default {
   data(){
       return{
-        content:'没有获取到相应数据',
-        content_left:''
+        content:'',
+        getContentErr:false
       }
     },
-  computed:{
-    check(){
-      this.content_left=this.content.leftList
-    }
-  },
   methods:{    
     getData(){
-      this.$axios.get('/getNewList')
+      this.$axios.get('api/getNewsList')
       .then((res)=>{
         this.content=res.data.getNewsList
+        this.getContentErr=false
       })
       .catch((error)=>{
-        console.log(error)
+        this.getContentErr=true
+        if (process.env.NODE_ENV !== 'production') {
+             console.log(error)
+        }
       })
       
     }
   },
   mounted(){
-    console.log(this.content_left)
-    if(this.content_left===''){
       this.getData()
-    }
   }
 }
 </script>
@@ -61,6 +58,7 @@ export default {
 .information{
   width: 1200px;
   margin: 0 auto;
+  min-height:300px;
   li{
   list-style-type: none;
 }
@@ -73,12 +71,20 @@ export default {
   display: block;
   padding: 10px 0;
 }
-
+.err{
+  position: absolute;
+  top:50%;
+  color:#666;
+  font-size:25px;
+  left: 38%;
+  span{
+    color:red
+  }
+}
 .is_hot{
   border-bottom:1px dashed rgb(199, 199, 199);
   padding-bottom:10px; 
 }
- 
   .tabs-right{
     padding: 30px 0 30px 36px;
     .is_text{

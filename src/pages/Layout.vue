@@ -6,14 +6,14 @@
       <el-row class="head-inner">
         <el-col class="head_title">
           <span>欢迎访问海岛旅游度假渔家官方网站!</span>
-          <span class="logReg" v-if="!logstate">
+          <span class="logReg" v-if="!logstatus">
             <p @click="dialogShow('log')">登陆</p>
             <p @click="dialogShow('reg')">注册</p>
           </span>
-          <span class="userList" v-if="logstate">
+          <span class="userList" v-if="logstatus">
             <p>欢迎你!，<span class="username">{{userName}}</span></p>
             <p>|</p>
-            <p class="closeLog" @click="closeLog">退出</p>
+            <p class="closeLog" @click="LogOut">退出</p>
           </span>
         </el-col>
         <el-col class="logo" :span="10">
@@ -54,7 +54,7 @@
         <router-view></router-view>
       </el-row>
       <el-row class="app_footer">
-        <el-col class="a">鸣谢我自己@18.1.30</el-col>
+        <el-col class="a">XXXXXX@xx.x.xx</el-col>
       </el-row>
   </div>
 </template>
@@ -79,24 +79,36 @@ export default {
       isLogShow:false,
       isRegShow:false,
       navBarRefresh:false,
-      logstate:false,
+      logstatus:false,
       userName:''
     }
   },
   methods:{
-      closeLog(){
-        this.logstate=false;
-        this.userName=''
+      LogOut(){
+        //向服务器请求，清除掉对应的sessionid，不记录登陆状态
+        this.$axios.post("/user/logOut").then((res)=>{
+          if(res.data){
+            this.logstatus=false;
+            this.userName=''
+          }
+        }).catch((err)=>{
+          if (process.env.NODE_ENV !== 'production') {
+             console.log(err)
+        }
+         
+        })
       },
       logchange(data){
-        this.setDialogShow('isLogShow')
-        this.logstate=true;
+        this.logstatus=true;
         this.userName=data
+        setTimeout(()=>{
+           this.setDialogShow('isLogShow')
+        },3000)
       },
       regchange(data){
-        this.setDialogShow('isRegShow')
-        this.logstate=true;
+        this.logstatus=true;
         this.userName=data
+        this.setDialogShow('isRegShow')
       },
       Navrefresh(){
         this.navBarRefresh=true;
@@ -123,6 +135,19 @@ export default {
       setDialogShow(attr){
         this[attr]=false;
       }
+  },
+  mounted(){
+    //从服务器获取用户登陆状态
+     this.$axios.post("api/user/Status").then((res)=>{
+        if(res.data.loginStatus){
+          this.logstatus=true
+          this.userName=res.data.username
+        }
+    }).catch((err)=>{
+      if (process.env.NODE_ENV !== 'production') {
+             console.log(err)
+        }
+    })
   },
 }
 </script>

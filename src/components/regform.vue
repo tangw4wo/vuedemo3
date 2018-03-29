@@ -3,10 +3,10 @@
         <div class="regform-wrap" v-if="!resErr">
             <div class="regTitle">注册会员</div> 
             <div class="reg-phone">
-                <div class="country-phone-covers" :class="{isErr:!userstate.phone && isphoerr}">
-                    <span class="phone-region" @click="openPhoneList">{{region}}<span class="arrowo"></span></span>
+                <div class="country-phone-covers" :class="{isErr:!userstatus.phone && isphoerr}">
+                    <span class="phone-region" @click="openPhoneList">{{user.region}}<span class="arrowo"></span></span>
                     <input type="text" class="user-phone"
-                    @blur="errstate('pho')" 
+                    @blur="errstatus('pho')" 
                     placeholder="手机号" maxlength="12" v-model.trim="user.phone">
                 </div>
                 <div class="err">{{phoneerr}}</div>
@@ -24,11 +24,11 @@
                        </li>
                    </ul>
                 </div>
-            <drag @users-live="checkuserstate" @drag-refresh="refresh" v-if="!dragrefresh"></drag>
+            <drag @users-live="checkuserstatus" @drag-refresh="refresh" v-if="!dragrefresh"></drag>
             <div class="refresh-loading" v-if="dragrefresh"></div>
-            <div class="reg-password" v-if="userstate.state">
-                <input type="password" class="user-password" maxlength="20" placeholder="请输入密码，最少10位数" v-model.lazy.trim="user.pw" @blur="errstate('pw')" :class="{isErr:!userstate.pw && ispwerr}">
-                <input type="password" class="againpassword" maxlength="20" placeholder="再一次输入密码" v-model.lazy.trim="againpw" :class="{isErr:!userstate.pw && againpwerr}" @blur="errstate('apw')">
+            <div class="reg-password" v-if="userstatus.status">
+                <input type="password" class="user-password" maxlength="20" placeholder="请输入密码，最少10位数" v-model.lazy.trim="user.pw" @blur="errstatus('pw')" :class="{isErr:!userstatus.pw && ispwerr}">
+                <input type="password" class="againpassword" maxlength="20" placeholder="再一次输入密码" v-model.lazy.trim="againpw" :class="{isErr:!userstatus.pw && againpwerr}" @blur="errstatus('apw')">
                 <div class="err">{{pwerr}}</div>
             </div>
             <div class="reg-btn">
@@ -49,8 +49,6 @@ export default {
     },
     data(){
         return{
-            //区号
-            region:'+86',
             //添加注册按钮样式
             setDisa:false,
             //判断密码验证状态
@@ -58,13 +56,13 @@ export default {
             //判断手机号码验证状态
             isphoerr:false,
             //所有项目的状态
-            userstate:{phone:false,state:false,pw:false},
+            userstatus:{phone:false,status:false,pw:false},
             //再一次输入密码内容
             againpw:'',
             //再一次输入密码错误状态
             againpwerr:false,
             //用户账号密码信息
-            user:{phone:'',pw:''},
+            user:{phone:'',pw:'',region:'+86'},
             //刷新组件的显示控制
             dragrefresh:false,
             //手机区号列表显示
@@ -76,72 +74,72 @@ export default {
             resErrText:'',
             //区号框控制
             list:'',
-            listerr:''
+            listerr:'',
       }
     },
     computed:{
         phoneerr(){
             if(this.user.phone==='' && !this.isphoerr){
                 this.resErrText=''
-                this.userstate.phone=false
+                this.userstatus.phone=false
                 return;
             }
             if(this.user.phone==='' && this.isphoerr){
                 this.resErrText=''
-                this.userstate.phone=false
+                this.userstatus.phone=false
                 return '请输入您的手机号码'
             }
             if(!/^1[3-8][\d]{9}$/.test(this.user.phone)){
                 this.resErrText=''
                 this.isphoerr=true
-                this.userstate.phone=false
+                this.userstatus.phone=false
                 return '请填写正确的手机号码'
             }
             if(!this.resErr && this.resErrText!==''){
                 this.isphoerr=true
-                this.userstate.phone=false
+                this.userstatus.phone=false
                 return this.resErrText
             }
             this.isphoerr=false;
-            this.userstate.phone=true
+            this.userstatus.phone=true
             this.regbtnShow()
         },
         pwerr(){
             if(this.user.pw==='' && !this.ispwerr){
-                this.userstate.pw=false;
+                this.userstatus.pw=false;
                 this.againpwerr=false;
                 return;
             }
             if(this.user.pw==='' && this.ispwerr){
-                this.userstate.pw=false;
+                this.userstatus.pw=false;
                 return '请填写您的密码'
             }
             if(!/^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{10,15}$/.test(this.user.pw)){
                 this.ispwerr=true;
                 this.againpwerr=false;
-                this.userstate.pw=false;
+                this.userstatus.pw=false;
                 return '密码不能只包含数字或字母，且不能包含特殊字符'
             }else{
                 this.ispwerr=false;
             }
             if(this.againpw==='' && !this.againpwerr){
-                this.userstate.pw=false;
+                this.userstatus.pw=false;
                 return;
             }
             if(this.user.pw===this.againpw){
                 this.regbtnShow()
                 this.againpwerr=false
-                this.userstate.pw=true;
+                this.userstatus.pw=true;
             }else{
                 this.againpwerr=true
-                this.userstate.pw=false;
+                this.userstatus.pw=false;
                 return '两次输入的密码不一致'
             }
         }
     },
     methods: {
         getRegion(item){
-            this.region=item
+            this.user.region=item
             this.closePhoneList()
         }
         ,        
@@ -155,18 +153,19 @@ export default {
             this.phonelist=false
         },
         getPhoneList(){
-            this.$axios.get('/phonelist').then((res)=>{
-                this.list=res.data.list
-                console.log(typeof res.data.list)
+            this.$axios.get('api/phonelist').then((res)=>{
+                this.list=res.data.phoneList
             }).catch((err)=>{
-                console.log(err)
+                if (process.env.NODE_ENV !== 'production') {
+                    console.log(err)
+                }
                 this.listerr="获取列表失败，请关闭重试"
             })
         }
         ,
         subRegform(){
             this.loadingProcedure=true;
-            this.$axios.post('/user/reg',JSON.stringify(this.user)).then((res)=>{
+            this.$axios.post('api/user/reg',JSON.stringify(this.user)).then((res)=>{
                 this.loadingProcedure=false;
                 let data = res.data
                 if(!data.err){
@@ -175,7 +174,9 @@ export default {
                     this.resErrText=data.text
                 }
             }).catch((err)=>{
-                console.log(err)
+                if (process.env.NODE_ENV !== 'production') {
+                 console.log(err)
+                }
             })
         }
         ,
@@ -187,8 +188,8 @@ export default {
             },1000)
         },
         regbtnShow(){
-          for(let i in this.userstate){
-              if(!this.userstate[i]){
+          for(let i in this.userstatus){
+              if(!this.userstatus[i]){
                   this.$refs.regbtn.disabled=true
                   this.setDisa=false
                   return false;
@@ -198,7 +199,7 @@ export default {
           this.$refs.regbtn.disabled=false
           this.setDisa=true
         },
-        errstate(err){
+        errstatus(err){
             if(err==='pho'){
               this.isphoerr=true            
             }
@@ -219,8 +220,8 @@ export default {
             }
             
         },
-        checkuserstate(){
-            this.userstate.state=true;
+        checkuserstatus(){
+            this.userstatus.status=true;
             this.isphoerr=true
             this.regbtnShow()
         },

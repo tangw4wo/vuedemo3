@@ -116,7 +116,7 @@
           <el-col><hr><p class="title_1">TRAVEL HOTEL</p><hr></el-col>
             <el-col><p class="title_2">友情链接</p></el-col>
             <el-col class="link">
-               <a v-for="(item,index) in linkList" :key="index" :href="item.herf">{{item.name}}</a>
+               <a v-for="(item,index) in linkList" :key="index" :href="item.herf" target="_blanck">{{item.name}}</a>
             </el-col>
       </el-row>
   </div>
@@ -141,7 +141,7 @@ export default {
             {name:"海岛特产",img:require("../assets/pic/img2.png"),herf:"xxx"},
             {name:"4",img:require("../assets/pic/img2.png"),herf:"xxx"}],
             tabs_activeIndex:0,
-            linkList:[{name:"百度旅游",herf:"xxx"},{name:"途牛旅游网",herf:"xxx"},{name:"携程旅游网",herf:"xxx"},{name:"腾讯旅游",herf:"xxx"},{name:"网易旅游",herf:"xxx"},{name:"新浪旅游",herf:"xxx"},{name:"去哪儿旅游网",herf:"xxx"},{name:"艺龙旅游网",herf:"xxx"},{name:"驴妈妈旅游网",herf:"xxx"},{name:"百度旅游",herf:"xxx"},{name:"途牛旅游网",herf:"xxx"},{name:"携程旅游网",herf:"xxx"},{name:"百度旅游",herf:"xxx"}],
+            linkList:[{name:"百度旅游",herf:"https://www.baidu.com/"},{name:"途牛旅游网",herf:"https://www.tuniu.com/"},{name:"携程旅游网",herf:"https://www.ctrip.com/"},{name:"腾讯旅游",herf:"http://ly.qq.com//"},{name:"网易旅游",herf:"http://travel.163.com/"},{name:"新浪旅游",herf:"http://travel.sina.com.cn/"},{name:"去哪儿旅游网",herf:"https://www.qunar.com/"},{name:"艺龙旅游网",herf:"http://www.elong.com"},{name:"驴妈妈旅游网",herf:"http://www.lvmama.com/"},{name:"百度旅游",herf:"https://www.baidu.com/"},{name:"途牛旅游网",herf:"https://www.tuniu.com/"},{name:"携程旅游网",herf:"https://www.ctrip.com/"},{name:"百度旅游",herf:"https://www.baidu.com/"}],
             orderList:{name:'',pho:'',num:'1',demand:'',check:''},
             iScheckError:false,
             iSerrorText:{error:false,text:''},
@@ -155,7 +155,6 @@ export default {
         },
         setNum(num){
             this.orderList.num=num
-            console.log(this.orderList.num)
         }
         ,
         reset(){
@@ -192,7 +191,7 @@ export default {
             this.postData();
         },
         postData(){
-            this.$axios.post('/oderList',JSON.stringify(this.orderList))
+            this.$axios.post('api/orderList',JSON.stringify(this.orderList))
             .then((res)=>{
             this.iScheckError=true;
             this.iSerrorText.text=res.data
@@ -207,7 +206,9 @@ export default {
             }
             })
             .catch((err)=>{
+            if (process.env.NODE_ENV !== 'production') {
                 console.log(err)
+                }
             })
         }
         ,

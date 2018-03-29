@@ -30,17 +30,29 @@ export default {
   },
   computed:{
     change(){
-      let src;let isactive = 'isactive-' 
+      let src;
+      let isactive = 'isactive-' 
       if(this.activeIndex === '/'){
         src = 'index'
       }else{
         src=this.activeIndex.replace(/\/+/,'')
       }
-      console.log(isactive+src)
       return isactive+src
     }
   },
+  watch:{
+    "$route"(val,oldval){
+      if(val.path==='/information' || val.path==='/strategy'){
+        this.activeIndex='/'
+      }else if(val.path==='/news/zx' || val.path==='/news/gl'){
+        this.activeIndex='/news'
+      }else{
+        this.activeIndex=val.path
+      }
+    }
+  },
   created () {
+    //监听当前路由地址并且将滑块移动到相应位置
     let src =this.$route.path.match(/\/[a-zA-z]+/).pop()
     if(src==='/information' || src === '/strategy'){
           return 

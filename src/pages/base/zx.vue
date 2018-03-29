@@ -1,34 +1,35 @@
 <template>
-  <el-row class="zx-wrap">
+<div class="zx-wrap">
+  <div class="err" v-if="getContentErr"><span>404 </span>无法获取到相应的内容</div>
+  <el-row class="zx-cover" v-if="!getContentErr">
     <el-col v-for="(item,index) in content" :key="index"  class="zx-item" v-if="!item.hot">
           <el-col :span="2" class="zx-title"><a href="">[渔家资讯 ]</a></el-col>
           <el-col :span="20" class="zx-content"><a href="">{{item.content}}</a></el-col>
           <el-col :span="2" class="zx-date">{{item.date}}</el-col>
     </el-col>
     </el-row>
+    </div>
 </template>
 <script>
 export default {
   data(){
       return{
         content:'没有获取到相应数据',
-        newsList:[]
+        getContentErr:false
       }
     },
-  computed:{
-    check(){
-      this.content_left=this.content.leftList
-    }
-  },
   methods:{    
     getData(){
-      this.$axios.get('/getNewList')
+      this.$axios.get('api/getNewsList')
       .then((res)=>{
-        console.log(res.data)
+        this.getContentErr=false
         this.content=res.data.getNewsList.leftList
       })
       .catch((error)=>{
-        console.log(error)
+        this.getContentErr=true
+        if (process.env.NODE_ENV !== 'production') {
+             console.log(error)
+        }
       })
       
     }
@@ -45,6 +46,19 @@ export default {
   font-size:@s
 }
 .zx-wrap{
+  min-height:300px;
+}
+.err{
+  position: absolute;
+  top:50%;
+  color:#666;
+  font-size:25px;
+  left: 38%;
+  span{
+    color:red
+  }
+}
+.zx-cover{
 
   .zx-item{
     height: 40px;

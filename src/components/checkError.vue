@@ -32,9 +32,6 @@ export default {
             },3000)
         },
         text(){
-            if(this.timeout){
-               clearTimeout(this.timeout)
-            }
             this.check_content();
             return this.isError.text
         }

@@ -22,7 +22,7 @@
         <div class="succeedText" v-if="!isloding">恭喜您 登陆成功！</div>
       </div>
   </div>
-</template>``
+</template>
 
 <script>
 export default {
@@ -44,28 +44,34 @@ export default {
             isloding:true
         }
     },
-    methods: {
+    methods:{
         gotoReg(){
             this.$emit('jumpReg')
         },
         checkUser(){
-            this.$axios.post('/user/login',JSON.stringify(this.user)).then((res)=>{
-                if(res.data!==''){
+            this.$axios.post('api/user/login',JSON.stringify(this.user)).then((res)=>{
+                if(res.data.status){
                     this.error_text=''
                     this.isloding=false
                     for(let i in this.user){
                         this.user[i]=''
                     }
-                    setTimeout(()=>{
-                        this.$emit('log-succeed',res.data)
-                    },3000)
+                    this.$emit('log-succeed',res.data.username)
+                    // setTimeout(()=>{
+                    //     this.$emit('log-succeed',res.data.username)
+                    // },3000)
                 }else{
                     this.userLogin=false
-                    this.error_text=res.data
+                    this.error_text=res.data.errtext
                     this.user.password=''
                 }
             }).catch((err)=>{
-                console.log(err)
+                this.userLogin=false
+                this.error_text="请求失败，请重试"
+                this.user.password=''
+                if (process.env.NODE_ENV !== 'production') {
+                    console.log(err)
+                }
             })        },
         changecolor(){
             if(!event.keyCode){
@@ -128,11 +134,10 @@ export default {
     input{
         color:#666;
         font-size: 13px;
-        padding-left:10px;
+        padding-left:5px;
         width:50%;
-    }
-    .log-username{
-        width:50%;
+        height: 25px;
+        line-height: 25px;
     }
     .logform-error{
         width: 50%;
