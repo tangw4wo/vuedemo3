@@ -137,7 +137,11 @@ export default {
         padding-left:5px;
         width:50%;
         height: 25px;
-        line-height: 25px;
+        line-height: 20px;
+        outline:none;
+        &:focus{
+            border:.05rem solid #409EFF
+        }
     }
     .logform-error{
         width: 50%;

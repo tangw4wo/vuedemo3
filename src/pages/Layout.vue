@@ -166,6 +166,8 @@ a{
 a,p,span,li{
  font-family: "微软雅黑";
 }
+//消除ie input样式
+::-ms-clear,::-ms-reveal{display:none;}
 .titleStyle{
     margin: 0;
     color:#666;
